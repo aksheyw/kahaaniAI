@@ -1,7 +1,10 @@
 {
   "functions": {
     "api/generate.js": {
-      "maxDuration": 60
+      "maxDuration": 180
+    },
+    "api/health.js": {
+      "maxDuration": 10
     }
   },
   "rewrites": [

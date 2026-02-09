@@ -15,10 +15,22 @@ const categoryColors = {
   health: '#22C55E',
 }
 
+function parseCategories(raw) {
+  if (!raw) return []
+  return raw
+    .split(/[|,]/)
+    .map(c => c.trim().toLowerCase())
+    .filter(Boolean)
+}
+
+function capitalize(str) {
+  return str.charAt(0).toUpperCase() + str.slice(1)
+}
+
 export default function ScriptCard({ script, index, language, costAnalysis }) {
   const [expanded, setExpanded] = useState(false)
   const [copied, setCopied] = useState(false)
-  const catColor = categoryColors[script.category?.toLowerCase()] || '#888'
+  const categories = parseCategories(script.category)
   const langLabel = language === 'hi' ? 'Hindi' : language === 'hinglish' ? 'Hinglish' : 'English'
 
   const preview = script.script?.substring(0, 200) || ''
@@ -45,12 +57,18 @@ export default function ScriptCard({ script, index, language, costAnalysis }) {
         <div className="flex-1 min-w-0">
           {/* Badges */}
           <div className="flex flex-wrap items-center gap-2 mb-3">
-            <span
-              className="px-3 py-1 rounded-full text-xs font-medium"
-              style={{ background: `${catColor}20`, color: catColor }}
-            >
-              {script.category}
-            </span>
+            {categories.map((cat) => {
+              const color = categoryColors[cat] || '#888'
+              return (
+                <span
+                  key={cat}
+                  className="px-3 py-1 rounded-full text-xs font-medium"
+                  style={{ background: `${color}20`, color }}
+                >
+                  {capitalize(cat)}
+                </span>
+              )
+            })}
             <span className={`px-3 py-1 rounded-full text-xs font-medium
               ${script.content_type === 'inform'
                 ? 'bg-[rgba(59,130,246,0.1)] text-blue-400'

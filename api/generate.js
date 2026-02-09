@@ -4,6 +4,25 @@
 const VALID_MODES = ['inform', 'imagine', 'both']
 const VALID_LANGUAGES = ['en', 'hi', 'hinglish']
 
+// Curated fallback topics for when RSS feeds return insufficient results
+const FALLBACK_TOPICS = [
+  'Indian Space Research Organisation (ISRO) latest mission updates',
+  'UPI digital payments revolution in India',
+  'Indian Premier League cricket season highlights',
+  'Bollywood box office trends and upcoming releases',
+  'Indian startup ecosystem funding and growth',
+  'Monsoon season impact on Indian agriculture',
+  'Ancient Indian mythology retold for modern audiences',
+  'Indian street food culture across different states',
+  'Indian classical music meets contemporary fusion',
+  'Wildlife conservation efforts in Indian national parks',
+  'Indian women breaking barriers in tech and business',
+  'Festival celebrations across India — traditions and stories',
+  'Indian railway journeys — untold stories from the tracks',
+  'Rise of Indian gaming and esports community',
+  'Traditional Ayurveda meets modern wellness trends',
+]
+
 export default async function handler(req, res) {
   // CORS — restrict to same origin in production
   const allowedOrigin = process.env.ALLOWED_ORIGIN || '*'
@@ -18,6 +37,7 @@ export default async function handler(req, res) {
   const rawLang = req.body?.language || 'en'
   const mode = VALID_MODES.includes(rawMode) ? rawMode : 'both'
   const language = VALID_LANGUAGES.includes(rawLang) ? rawLang : 'en'
+  const excludeTopics = Array.isArray(req.body?.exclude_topics) ? req.body.exclude_topics : []
 
   const OPENAI_KEY = process.env.OPENAI_API_KEY
   if (!OPENAI_KEY) return res.status(500).json({ error: 'Service not configured' })
@@ -47,8 +67,17 @@ export default async function handler(req, res) {
       return titles
     }
 
-    const news = getTitles(newsResp)
-    const trends = getTitles(trendsResp)
+    let news = getTitles(newsResp)
+    let trends = getTitles(trendsResp)
+
+    // RSS fallback — if feeds return fewer than 5 total items, supplement with curated topics
+    const totalFeedItems = news.length + trends.length
+    if (totalFeedItems < 5) {
+      const shuffled = [...FALLBACK_TOPICS].sort(() => Math.random() - 0.5)
+      const needed = Math.max(10 - totalFeedItems, 5)
+      const fallbackSlice = shuffled.slice(0, needed)
+      news = [...news, ...fallbackSlice]
+    }
 
     const modeText = mode === 'inform' ? 'Educational/Knowledge content only'
       : mode === 'imagine' ? 'Fiction/Drama stories only'
@@ -59,6 +88,11 @@ export default async function handler(req, res) {
 
     const newsStr = news.map((t, i) => `${i + 1}. ${t}`).join('\n')
     const trendsStr = trends.map((t, i) => `${i + 1}. ${t}`).join('\n')
+
+    // Build exclusion instruction if there are previously used topics
+    const exclusionBlock = excludeTopics.length > 0
+      ? `\n\nPREVIOUSLY USED TOPICS (do NOT select any of these or closely related topics):\n${excludeTopics.slice(0, 30).map((t, i) => `- ${t}`).join('\n')}\n`
+      : ''
 
     // ── Step 2: Research Agent — select 3 topics ──
     const researchPrompt = `You are a senior content strategist for a premium Indian audio platform. Analyze these trending topics and select 3 for audio scripts.
@@ -71,18 +105,19 @@ ${newsStr}
 
 TRENDING SEARCHES (Google Trends India):
 ${trendsStr}
-
+${exclusionBlock}
 Select exactly 3 topics with highest audio content potential for Indian audiences. Consider cultural relevance, emotional resonance, and timeliness.
 
-Respond with valid JSON only, no markdown code fences:
+Respond with this JSON structure:
 {"selected_topics":[{"topic":"Topic title","content_type":"inform or imagine","category":"news|culture|mythology|drama|technology|sports|politics|entertainment|finance|health","angle":"Suggested creative angle","rationale":"Why high potential"}],"research_summary":"2-line summary of trending landscape","topics_analyzed":${news.length + trends.length}}`
 
-    const researchResp = await callOpenAI(OPENAI_KEY, researchPrompt, 0.7, 2000)
+    const researchResp = await callOpenAI(OPENAI_KEY, researchPrompt, 0.7, 2000, true)
 
     let research
     try {
       research = JSON.parse(researchResp)
     } catch {
+      // Fallback parsing for non-JSON responses
       const m = researchResp.match(/```(?:json)?\s*([\s\S]*?)\s*```/)
       if (m) research = JSON.parse(m[1])
       else {
@@ -117,15 +152,16 @@ For each of the 3 topics, write an audio script following these rules:
 - End each script with a memorable closing line
 - Rate your confidence in each script honestly
 
-Respond with valid JSON only, no markdown code fences:
+Respond with this JSON structure:
 {"scripts":[{"topic":"Topic title","content_type":"inform or imagine","category":"category","title":"Creative compelling title","script":"Full script text...","word_count":950,"estimated_audio_minutes":7.5,"hook":"First 30 words","confidence_score":{"overall":82,"hook_strength":85,"narrative_flow":80,"emotional_engagement":78,"audio_readiness":84},"confidence_rationale":"Brief honest explanation of strengths and weaknesses"}]}`
 
-    const writerResp = await callOpenAI(OPENAI_KEY, writerPrompt, 0.8, 8000)
+    const writerResp = await callOpenAI(OPENAI_KEY, writerPrompt, 0.8, 8000, true)
 
     let scriptData
     try {
       scriptData = JSON.parse(writerResp)
     } catch {
+      // Fallback parsing for non-JSON responses
       const m = writerResp.match(/```(?:json)?\s*([\s\S]*?)\s*```/)
       if (m) scriptData = JSON.parse(m[1])
       else {
@@ -196,19 +232,31 @@ Respond with valid JSON only, no markdown code fences:
   }
 }
 
-async function callOpenAI(apiKey, prompt, temperature, maxTokens) {
+async function callOpenAI(apiKey, prompt, temperature, maxTokens, jsonMode = false) {
+  const body = {
+    model: 'gpt-4.1',
+    messages: [
+      ...(jsonMode
+        ? [{ role: 'system', content: 'You are a helpful assistant. Always respond with valid JSON.' }]
+        : []),
+      { role: 'user', content: prompt },
+    ],
+    temperature,
+    max_tokens: maxTokens,
+  }
+
+  // Enable JSON mode when requested
+  if (jsonMode) {
+    body.response_format = { type: 'json_object' }
+  }
+
   const resp = await fetch('https://api.openai.com/v1/chat/completions', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${apiKey}`,
     },
-    body: JSON.stringify({
-      model: 'gpt-4.1',
-      messages: [{ role: 'user', content: prompt }],
-      temperature,
-      max_tokens: maxTokens,
-    }),
+    body: JSON.stringify(body),
   })
   if (!resp.ok) {
     const err = await resp.text()

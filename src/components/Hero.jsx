@@ -12,7 +12,7 @@ const languages = [
   { id: 'hinglish', label: 'Hinglish' },
 ]
 
-export default function Hero({ mode, setMode, language, setLanguage, onGenerate, loading }) {
+export default function Hero({ mode, setMode, language, setLanguage, onGenerate, loading, hasResults }) {
   return (
     <div className="pt-20 sm:pt-28 pb-8 text-center">
       {/* Logo */}
@@ -70,23 +70,26 @@ export default function Hero({ mode, setMode, language, setLanguage, onGenerate,
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, delay: 0.5 }}
-        className="mt-5 flex justify-center gap-2"
+        className="mt-5"
       >
-        {languages.map((l) => (
-          <button
-            key={l.id}
-            onClick={() => setLanguage(l.id)}
-            className={`
-              px-4 py-2 rounded-xl text-xs font-medium transition-all duration-300
-              ${language === l.id
-                ? 'bg-[rgba(245,166,35,0.1)] text-[#F5A623] border border-[rgba(245,166,35,0.25)]'
-                : 'text-[#666] hover:text-[#999] border border-transparent'
-              }
-            `}
-          >
-            {l.label}
-          </button>
-        ))}
+        <p className="text-[10px] uppercase tracking-widest text-[#666] mb-2">Script Language</p>
+        <div className="flex justify-center gap-2">
+          {languages.map((l) => (
+            <button
+              key={l.id}
+              onClick={() => setLanguage(l.id)}
+              className={`
+                px-4 py-2.5 rounded-xl text-xs font-medium transition-all duration-300
+                ${language === l.id
+                  ? 'bg-[rgba(245,166,35,0.1)] text-[#F5A623] border border-[rgba(245,166,35,0.25)]'
+                  : 'text-[#666] hover:text-[#999] border border-transparent'
+                }
+              `}
+            >
+              {l.label}
+            </button>
+          ))}
+        </div>
       </motion.div>
 
       {/* Generate Button */}
@@ -107,7 +110,7 @@ export default function Hero({ mode, setMode, language, setLanguage, onGenerate,
             }
           `}
         >
-          {loading ? 'Generating...' : 'Generate Scripts'}
+          {loading ? 'Generating...' : hasResults ? 'Regenerate Scripts' : 'Generate Scripts'}
         </button>
       </motion.div>
     </div>

@@ -24,7 +24,7 @@ export default function LoadingStages({ language }) {
     return () => timers.forEach(clearTimeout)
   }, [])
 
-  // Track elapsed seconds for the "still working" message
+  // Track elapsed seconds
   useEffect(() => {
     const interval = setInterval(() => setElapsed(e => e + 1), 1000)
     return () => clearInterval(interval)
@@ -34,6 +34,13 @@ export default function LoadingStages({ language }) {
   const allStagesDone = currentStage === stages.length - 1
   const totalTimerDone = elapsed > 32
 
+  const formatElapsed = (s) => {
+    if (s < 60) return `${s}s`
+    const mins = Math.floor(s / 60)
+    const secs = s % 60
+    return `${mins}m ${secs}s`
+  }
+
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -42,6 +49,14 @@ export default function LoadingStages({ language }) {
       className="mt-16 max-w-lg mx-auto"
     >
       <div className="glass rounded-2xl p-8 sm:p-10">
+        {/* Time estimate banner */}
+        <div className="mb-6 flex items-center justify-between text-xs">
+          <span className="text-[#999]">
+            This usually takes <span className="text-[#FAFAFA] font-medium">1–2 minutes</span>
+          </span>
+          <span className="text-[#F5A623] font-mono tabular-nums">{formatElapsed(elapsed)}</span>
+        </div>
+
         <div className="space-y-5">
           {stages.map((stage, i) => {
             const isActive = i === currentStage
@@ -120,7 +135,7 @@ export default function LoadingStages({ language }) {
           )}
         </div>
 
-        {/* Progress bar — stops at 90% until "still working" then pulses */}
+        {/* Progress bar */}
         <div className="mt-8 h-1 bg-[rgba(255,255,255,0.05)] rounded-full overflow-hidden">
           <motion.div
             className="h-full bg-gradient-to-r from-[#F5A623] to-[#E8B84B] rounded-full"
@@ -137,6 +152,11 @@ export default function LoadingStages({ language }) {
             }
           />
         </div>
+
+        {/* Keep tab open reminder */}
+        <p className="mt-4 text-center text-[10px] text-[#666]">
+          Please keep this tab open while scripts are being generated
+        </p>
       </div>
     </motion.div>
   )

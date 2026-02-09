@@ -47,8 +47,8 @@ export default function ConfidenceScore({ score, rationale }) {
       >
         <CircularProgress score={overall} />
         <div className="text-left">
-          <p className="text-xs text-[#888] group-hover:text-[#aaa] transition-colors">AI Confidence</p>
-          <p className="text-xs text-[#555]">{expanded ? 'Hide' : 'See'} breakdown</p>
+          <p className="text-xs text-[#999] group-hover:text-[#aaa] transition-colors">AI Confidence</p>
+          <p className="text-xs text-[#888]">{expanded ? 'Hide' : 'See'} breakdown</p>
         </div>
       </button>
 
@@ -61,7 +61,7 @@ export default function ConfidenceScore({ score, rationale }) {
             transition={{ duration: 0.3 }}
             className="overflow-hidden"
           >
-            <div className="mt-4 space-y-3 w-48">
+            <div className="mt-4 space-y-3 w-full sm:w-48">
               {Object.entries(breakdownLabels).map(([key, label]) => {
                 const val = score?.[key] || 0
                 return (
@@ -83,7 +83,7 @@ export default function ConfidenceScore({ score, rationale }) {
                 )
               })}
               {rationale && (
-                <p className="text-xs text-[#666] mt-3 leading-relaxed italic">{rationale}</p>
+                <p className="text-xs text-[#999] mt-3 leading-relaxed italic">{rationale}</p>
               )}
             </div>
           </motion.div>

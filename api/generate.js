@@ -1,17 +1,26 @@
 // Vercel Serverless Function — Kahaani AI Script Generator
 // Replicates n8n workflow: RSS fetch → Research Agent → Writer Agent → Format
 
+const VALID_MODES = ['inform', 'imagine', 'both']
+const VALID_LANGUAGES = ['en', 'hi', 'hinglish']
+
 export default async function handler(req, res) {
-  // CORS
-  res.setHeader('Access-Control-Allow-Origin', '*')
+  // CORS — restrict to same origin in production
+  const allowedOrigin = process.env.ALLOWED_ORIGIN || '*'
+  res.setHeader('Access-Control-Allow-Origin', allowedOrigin)
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS')
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type')
   if (req.method === 'OPTIONS') return res.status(200).end()
   if (req.method !== 'POST') return res.status(405).json({ error: 'POST only' })
 
-  const { mode = 'both', language = 'en' } = req.body || {}
+  // Input validation
+  const rawMode = req.body?.mode || 'both'
+  const rawLang = req.body?.language || 'en'
+  const mode = VALID_MODES.includes(rawMode) ? rawMode : 'both'
+  const language = VALID_LANGUAGES.includes(rawLang) ? rawLang : 'en'
+
   const OPENAI_KEY = process.env.OPENAI_API_KEY
-  if (!OPENAI_KEY) return res.status(500).json({ error: 'OPENAI_API_KEY not configured' })
+  if (!OPENAI_KEY) return res.status(500).json({ error: 'Service not configured' })
 
   try {
     // ── Step 1: Fetch RSS feeds in parallel ──
@@ -183,7 +192,7 @@ Respond with valid JSON only, no markdown code fences:
     })
   } catch (err) {
     console.error('Kahaani API error:', err)
-    return res.status(500).json({ error: err.message || 'Internal server error' })
+    return res.status(500).json({ error: 'Script generation failed. Please try again.' })
   }
 }
 

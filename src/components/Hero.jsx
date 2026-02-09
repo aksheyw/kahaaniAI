@@ -1,9 +1,9 @@
 import { motion } from 'framer-motion'
 
 const modes = [
-  { id: 'inform', label: 'Inform', icon: '💡', desc: 'Educational' },
-  { id: 'imagine', label: 'Imagine', icon: '✨', desc: 'Fiction & Drama' },
-  { id: 'both', label: 'Both', icon: '🎯', desc: 'Mixed' },
+  { id: 'inform', label: 'Inform', icon: '💡', desc: 'Trending news explainers' },
+  { id: 'imagine', label: 'Imagine', icon: '✨', desc: 'Fiction & drama stories' },
+  { id: 'both', label: 'Both', icon: '🎯', desc: 'Mix of both' },
 ]
 
 const languages = [
@@ -60,6 +60,7 @@ export default function Hero({ mode, setMode, language, setLanguage, onGenerate,
           >
             <span className="mr-1.5">{m.icon}</span>
             <span>{m.label}</span>
+            <span className="block text-[10px] font-normal opacity-60 mt-0.5">{m.desc}</span>
           </button>
         ))}
       </motion.div>
@@ -102,7 +103,7 @@ export default function Hero({ mode, setMode, language, setLanguage, onGenerate,
             relative px-10 py-4 rounded-2xl text-lg font-bold transition-all duration-500
             ${loading
               ? 'bg-[rgba(245,166,35,0.2)] text-[#F5A623] cursor-wait'
-              : 'bg-[#F5A623] text-black hover:bg-[#E8B84B] hover:shadow-[0_0_40px_rgba(245,166,35,0.3)] pulse-gold'
+              : 'bg-[#F5A623] text-black hover:bg-[#E8B84B] hover:shadow-[0_0_40px_rgba(245,166,35,0.3)]'
             }
           `}
         >

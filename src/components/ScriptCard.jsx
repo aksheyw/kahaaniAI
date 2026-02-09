@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import ConfidenceScore from './ConfidenceScore'
 
@@ -15,12 +15,23 @@ const categoryColors = {
   health: '#22C55E',
 }
 
-export default function ScriptCard({ script, index, language }) {
+export default function ScriptCard({ script, index, language, costAnalysis }) {
   const [expanded, setExpanded] = useState(false)
+  const [copied, setCopied] = useState(false)
   const catColor = categoryColors[script.category?.toLowerCase()] || '#888'
   const langLabel = language === 'hi' ? 'Hindi' : language === 'hinglish' ? 'Hinglish' : 'English'
 
   const preview = script.script?.substring(0, 200) || ''
+  const aiPerScript = costAnalysis?.ai?.per_script_inr ?? 0
+  const humanPerScript = costAnalysis?.human?.per_script_inr ?? 650
+
+  const copyScript = useCallback(() => {
+    if (!script.script) return
+    navigator.clipboard.writeText(script.script).then(() => {
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    })
+  }, [script.script])
 
   return (
     <motion.div
@@ -113,19 +124,25 @@ export default function ScriptCard({ script, index, language }) {
       </div>
 
       {/* Metrics row */}
-      <div className="mt-6 pt-5 border-t border-[rgba(255,255,255,0.05)] flex flex-wrap items-center gap-x-6 gap-y-2 text-xs text-[#888]">
+      <div className="mt-6 pt-5 border-t border-[rgba(255,255,255,0.05)] flex flex-wrap items-center gap-x-6 gap-y-2 text-xs text-[#999]">
         <span>{script.word_count?.toLocaleString()} words</span>
-        <span className="text-[rgba(255,255,255,0.15)]">|</span>
+        <span className="text-[rgba(255,255,255,0.15)] hidden sm:inline">|</span>
         <span>{script.estimated_audio_minutes} min audio</span>
-        <span className="text-[rgba(255,255,255,0.15)]">|</span>
+        <span className="text-[rgba(255,255,255,0.15)] hidden sm:inline">|</span>
         <span>{langLabel}</span>
-        <span className="text-[rgba(255,255,255,0.15)]">|</span>
+        <span className="text-[rgba(255,255,255,0.15)] hidden sm:inline">|</span>
         <span>
-          <span className="text-[#F5A623] font-semibold">~₹1</span>
+          <span className="text-[#F5A623] font-semibold">₹{aiPerScript.toFixed(2)}</span>
           {' '}AI vs{' '}
-          <span className="text-[#888]">₹650</span>
+          <span className="text-[#999]">₹{humanPerScript.toLocaleString()}</span>
           {' '}human
         </span>
+        <button
+          onClick={copyScript}
+          className="ml-auto px-3 py-1 rounded-lg text-xs font-medium text-[#999] hover:text-[#F5A623] border border-[rgba(255,255,255,0.08)] hover:border-[rgba(245,166,35,0.3)] transition-all duration-300"
+        >
+          {copied ? 'Copied!' : 'Copy Script'}
+        </button>
       </div>
     </motion.div>
   )

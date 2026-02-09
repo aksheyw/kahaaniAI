@@ -4,11 +4,19 @@ import Hero from './components/Hero'
 import LoadingStages from './components/LoadingStages'
 import ResultsSummary from './components/ResultsSummary'
 import ScriptCard from './components/ScriptCard'
-import ConfidenceScore from './components/ConfidenceScore'
 
-// Default: Vercel serverless function (standalone, no n8n dependency)
-// To use n8n webhook: set VITE_API_URL=https://n8n.srv1134430.hstgr.cloud/webhook/kahaani-generate
 const API_URL = import.meta.env.VITE_API_URL || '/api/generate'
+
+function friendlyError(raw) {
+  if (!raw) return 'Something went wrong. Please try again.'
+  if (raw.includes('500') || raw.includes('Internal'))
+    return 'Our AI is taking a moment. Please try again.'
+  if (raw.includes('timeout') || raw.includes('abort'))
+    return 'The request took too long. Please try again — it usually works on the second attempt.'
+  if (raw.includes('Failed to fetch') || raw.includes('NetworkError'))
+    return 'Please check your internet connection and try again.'
+  return 'Something went wrong. Please try again.'
+}
 
 export default function App() {
   const [mode, setMode] = useState('both')
@@ -21,12 +29,18 @@ export default function App() {
     setLoading(true)
     setError(null)
     setResults(null)
+
+    const controller = new AbortController()
+    const timeout = setTimeout(() => controller.abort(), 90000)
+
     try {
       const res = await fetch(API_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ mode, language }),
+        signal: controller.signal,
       })
+      clearTimeout(timeout)
       if (!res.ok) throw new Error(`Server error: ${res.status}`)
       const data = await res.json()
       if (data.status === 'success') {
@@ -35,7 +49,8 @@ export default function App() {
         throw new Error(data.error || 'Generation failed')
       }
     } catch (err) {
-      setError(err.message || 'Something went wrong. Please try again.')
+      clearTimeout(timeout)
+      setError(friendlyError(err.message))
     } finally {
       setLoading(false)
     }
@@ -89,9 +104,9 @@ export default function App() {
 
               {/* Research Summary */}
               <div className="mt-10 glass rounded-2xl p-6 sm:p-8">
-                <h3 className="text-sm font-medium text-[#888] uppercase tracking-wider mb-3">Research Summary</h3>
+                <h3 className="text-sm font-medium text-[#999] uppercase tracking-wider mb-3">Research Summary</h3>
                 <p className="text-[#FAFAFA] text-lg leading-relaxed">{results.research?.summary}</p>
-                <div className="mt-4 flex flex-wrap gap-4 text-sm text-[#888]">
+                <div className="mt-4 flex flex-wrap gap-4 text-sm text-[#999]">
                   <span>Sources: {results.research?.sources?.join(', ')}</span>
                   <span className="text-[rgba(255,255,255,0.2)]">|</span>
                   <span>Topics analyzed: <span className="text-[#F5A623] font-semibold">{results.research?.topics_analyzed}</span></span>
@@ -101,7 +116,7 @@ export default function App() {
               {/* Script Cards */}
               <div className="mt-10 space-y-6">
                 {results.scripts?.map((script, i) => (
-                  <ScriptCard key={i} script={script} index={i} language={language} />
+                  <ScriptCard key={i} script={script} index={i} language={language} costAnalysis={results.cost_analysis} />
                 ))}
               </div>
 
@@ -119,8 +134,8 @@ export default function App() {
         </AnimatePresence>
 
         {/* Footer */}
-        <footer className="py-12 text-center text-[#555] text-sm border-t border-[rgba(255,255,255,0.05)]">
-          Powered by Kahaani AI &middot; Built with GPT-4.1
+        <footer className="py-12 text-center text-[#888] text-sm border-t border-[rgba(255,255,255,0.05)]">
+          Powered by Kahaani AI
         </footer>
       </div>
     </div>

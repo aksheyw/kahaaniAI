@@ -106,7 +106,7 @@ export default function App() {
       {history.length > 0 && (
         <button
           onClick={() => setHistoryOpen(true)}
-          className="fixed top-6 right-6 z-30 px-4 py-2 rounded-xl text-xs font-medium text-[#999] hover:text-[#F5A623] border border-[rgba(255,255,255,0.08)] hover:border-[rgba(245,166,35,0.3)] bg-[rgba(0,0,0,0.6)] backdrop-blur-sm transition-all duration-300"
+          className="fixed top-4 right-4 sm:top-6 sm:right-6 z-30 px-4 py-2 rounded-xl text-xs font-medium text-[#999] hover:text-[#F5A623] border border-[rgba(255,255,255,0.08)] hover:border-[rgba(245,166,35,0.3)] bg-[rgba(0,0,0,0.6)] backdrop-blur-sm transition-all duration-300"
         >
           History ({history.length})
         </button>

@@ -1,4 +1,5 @@
 import { motion, AnimatePresence } from 'framer-motion'
+import { Lightbulb, Sparkles, Target } from 'lucide-react'
 
 function formatTime(iso) {
   try {
@@ -14,10 +15,20 @@ function formatTime(iso) {
   }
 }
 
-function modeLabel(mode) {
-  if (mode === 'inform') return '💡 Inform'
-  if (mode === 'imagine') return '✨ Imagine'
-  return '🎯 Both'
+const modeIcons = {
+  inform: { Icon: Lightbulb, label: 'Inform' },
+  imagine: { Icon: Sparkles, label: 'Imagine' },
+  both: { Icon: Target, label: 'Both' },
+}
+
+function ModeLabel({ mode }) {
+  const { Icon, label } = modeIcons[mode] || modeIcons.both
+  return (
+    <span className="flex items-center gap-1 text-xs text-[#999]">
+      <Icon size={10} strokeWidth={2} />
+      {label}
+    </span>
+  )
 }
 
 export default function HistoryDrawer({ open, onClose, history, onClear }) {
@@ -48,7 +59,7 @@ export default function HistoryDrawer({ open, onClose, history, onClear }) {
                 <h2 className="text-lg font-bold text-[#FAFAFA]">Generation History</h2>
                 <button
                   onClick={onClose}
-                  className="text-[#999] hover:text-[#FAFAFA] text-2xl leading-none transition-colors"
+                  className="w-10 h-10 flex items-center justify-center rounded-lg text-[#999] hover:text-[#FAFAFA] text-2xl leading-none transition-colors hover:bg-[rgba(255,255,255,0.05)]"
                 >
                   ×
                 </button>
@@ -66,7 +77,7 @@ export default function HistoryDrawer({ open, onClose, history, onClear }) {
                       {/* Meta */}
                       <div className="flex items-center justify-between mb-3">
                         <span className="text-xs text-[#888]">{formatTime(entry.timestamp)}</span>
-                        <span className="text-xs text-[#999]">{modeLabel(entry.mode)}</span>
+                        <ModeLabel mode={entry.mode} />
                       </div>
 
                       {/* Script titles */}

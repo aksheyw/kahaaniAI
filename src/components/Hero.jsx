@@ -1,9 +1,10 @@
 import { motion } from 'framer-motion'
+import { Lightbulb, Sparkles, Target } from 'lucide-react'
 
 const modes = [
-  { id: 'inform', label: 'Inform', icon: '💡', desc: 'Trending news explainers' },
-  { id: 'imagine', label: 'Imagine', icon: '✨', desc: 'Fiction & drama stories' },
-  { id: 'both', label: 'Both', icon: '🎯', desc: 'Mix of both' },
+  { id: 'inform', label: 'Inform', Icon: Lightbulb, desc: 'Trending news explainers' },
+  { id: 'imagine', label: 'Imagine', Icon: Sparkles, desc: 'Fiction & drama stories' },
+  { id: 'both', label: 'Both', Icon: Target, desc: 'Mix of both' },
 ]
 
 const languages = [
@@ -58,8 +59,10 @@ export default function Hero({ mode, setMode, language, setLanguage, onGenerate,
               }
             `}
           >
-            <span className="mr-1.5">{m.icon}</span>
-            <span>{m.label}</span>
+            <span className="flex items-center justify-center gap-1.5">
+              <m.Icon size={14} strokeWidth={2} />
+              <span>{m.label}</span>
+            </span>
             <span className="block text-[10px] font-normal opacity-60 mt-0.5">{m.desc}</span>
           </button>
         ))}
@@ -72,7 +75,7 @@ export default function Hero({ mode, setMode, language, setLanguage, onGenerate,
         transition={{ duration: 0.6, delay: 0.5 }}
         className="mt-5"
       >
-        <p className="text-[10px] uppercase tracking-widest text-[#666] mb-2">Script Language</p>
+        <p className="text-[10px] uppercase tracking-widest text-[#777] mb-2">Script Language</p>
         <div className="flex justify-center gap-2">
           {languages.map((l) => (
             <button
@@ -82,7 +85,7 @@ export default function Hero({ mode, setMode, language, setLanguage, onGenerate,
                 px-4 py-2.5 rounded-xl text-xs font-medium transition-all duration-300
                 ${language === l.id
                   ? 'bg-[rgba(245,166,35,0.1)] text-[#F5A623] border border-[rgba(245,166,35,0.25)]'
-                  : 'text-[#666] hover:text-[#999] border border-transparent'
+                  : 'text-[#777] hover:text-[#999] border border-transparent'
                 }
               `}
             >
@@ -110,7 +113,7 @@ export default function Hero({ mode, setMode, language, setLanguage, onGenerate,
             }
           `}
         >
-          {loading ? 'Generating...' : hasResults ? 'Regenerate Scripts' : 'Generate Scripts'}
+          {loading ? 'Generating...' : hasResults ? 'Generate New Scripts' : 'Generate Scripts'}
         </button>
       </motion.div>
     </div>

@@ -4,6 +4,9 @@
 const VALID_MODES = ['inform', 'imagine', 'both']
 const VALID_LANGUAGES = ['en', 'hi', 'hinglish']
 
+// Per-call timeout for OpenAI requests (75s each, allowing two calls within 180s budget)
+const OPENAI_CALL_TIMEOUT_MS = 75000
+
 // Curated fallback topics for when RSS feeds return insufficient results
 const FALLBACK_TOPICS = [
   'Indian Space Research Organisation (ISRO) latest mission updates',
@@ -57,8 +60,8 @@ export default async function handler(req, res) {
         const a = parts[i].indexOf('<title>')
         const b = parts[i].indexOf('</title>')
         if (a > -1 && b > a) {
-          let t = parts[i].substring(a + 7, b)
-            .replace('<![CDATA[', '').replace(']]>', '')
+          const t = parts[i].substring(a + 7, b)
+            .replace(/<!\\[CDATA\\[/g, '').replace(/\\]\\]>/g, '')
             .replace(/&amp;/g, '&').replace(/&#39;/g, "'").replace(/&quot;/g, '"')
             .trim()
           if (t.length > 3) titles.push(t)
@@ -91,7 +94,7 @@ export default async function handler(req, res) {
 
     // Build exclusion instruction if there are previously used topics
     const exclusionBlock = excludeTopics.length > 0
-      ? `\n\nPREVIOUSLY USED TOPICS (do NOT select any of these or closely related topics):\n${excludeTopics.slice(0, 30).map((t, i) => `- ${t}`).join('\n')}\n`
+      ? `\n\nPREVIOUSLY USED TOPICS (do NOT select any of these or closely related topics):\n${excludeTopics.slice(0, 30).map((t) => `- ${t}`).join('\n')}\n`
       : ''
 
     // ── Step 2: Research Agent — select 3 topics ──
@@ -121,7 +124,7 @@ Respond with this JSON structure:
       const m = researchResp.match(/```(?:json)?\s*([\s\S]*?)\s*```/)
       if (m) research = JSON.parse(m[1])
       else {
-        const om = researchResp.match(/\{[\s\S]*\}/)
+        const om = researchResp.match(/\{[\s\S]*?\}(?=[^}]*$)/)
         if (om) research = JSON.parse(om[0])
         else throw new Error('Cannot parse research response')
       }
@@ -165,7 +168,7 @@ Respond with this JSON structure:
       const m = writerResp.match(/```(?:json)?\s*([\s\S]*?)\s*```/)
       if (m) scriptData = JSON.parse(m[1])
       else {
-        const om = writerResp.match(/\{[\s\S]*\}/)
+        const om = writerResp.match(/\{[\s\S]*?\}(?=[^}]*$)/)
         if (om) scriptData = JSON.parse(om[0])
         else scriptData = { scripts: [{ error: 'Parse failed', raw: writerResp.substring(0, 500) }] }
       }
@@ -184,11 +187,13 @@ Respond with this JSON structure:
     const humanPerScript = 650
     const humanTotal = humanPerScript * 3
 
-    let totalWords = 0, totalMins = 0
-    scripts.forEach(s => {
-      totalWords += s.word_count || 0
-      totalMins += s.estimated_audio_minutes || 0
-    })
+    const { totalWords, totalMins } = scripts.reduce(
+      (acc, s) => ({
+        totalWords: acc.totalWords + (s.word_count || 0),
+        totalMins: acc.totalMins + (s.estimated_audio_minutes || 0),
+      }),
+      { totalWords: 0, totalMins: 0 }
+    )
 
     return res.status(200).json({
       status: 'success',
@@ -221,13 +226,13 @@ Respond with this JSON structure:
           basis: 'Indian freelance content marketplace average',
         },
         savings: {
-          multiplier: Math.round(humanTotal / totalINR) + 'x',
+          multiplier: totalINR > 0 ? Math.round(humanTotal / totalINR) + 'x' : 'N/A',
           saved_inr: Math.round(humanTotal - totalINR),
         },
       },
     })
   } catch (err) {
-    console.error('Kahaani API error:', err)
+    console.error('Kahaani API error:', err.message)
     return res.status(500).json({ error: 'Script generation failed. Please try again.' })
   }
 }
@@ -250,18 +255,32 @@ async function callOpenAI(apiKey, prompt, temperature, maxTokens, jsonMode = fal
     body.response_format = { type: 'json_object' }
   }
 
-  const resp = await fetch('https://api.openai.com/v1/chat/completions', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${apiKey}`,
-    },
-    body: JSON.stringify(body),
-  })
-  if (!resp.ok) {
-    const err = await resp.text()
-    throw new Error(`OpenAI API error (${resp.status}): ${err}`)
+  // Per-call timeout to prevent a single call from consuming the entire function budget
+  const controller = new AbortController()
+  const timeout = setTimeout(() => controller.abort(), OPENAI_CALL_TIMEOUT_MS)
+
+  try {
+    const resp = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${apiKey}`,
+      },
+      body: JSON.stringify(body),
+      signal: controller.signal,
+    })
+    clearTimeout(timeout)
+    if (!resp.ok) {
+      const errText = await resp.text()
+      throw new Error(`OpenAI API error (${resp.status}): ${errText.substring(0, 200)}`)
+    }
+    const data = await resp.json()
+    return data.choices[0].message.content
+  } catch (err) {
+    clearTimeout(timeout)
+    if (err.name === 'AbortError') {
+      throw new Error('OpenAI call timed out after 75 seconds')
+    }
+    throw err
   }
-  const data = await resp.json()
-  return data.choices[0].message.content
 }

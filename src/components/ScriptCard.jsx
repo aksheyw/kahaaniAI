@@ -1,5 +1,6 @@
 import { useState, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { Lightbulb, Sparkles } from 'lucide-react'
 import ConfidenceScore from './ConfidenceScore'
 
 const categoryColors = {
@@ -42,7 +43,7 @@ export default function ScriptCard({ script, index, language, costAnalysis }) {
     navigator.clipboard.writeText(script.script).then(() => {
       setCopied(true)
       setTimeout(() => setCopied(false), 2000)
-    })
+    }).catch(() => { /* clipboard API may be blocked in some browsers */ })
   }, [script.script])
 
   return (
@@ -75,7 +76,12 @@ export default function ScriptCard({ script, index, language, costAnalysis }) {
                 : 'bg-[rgba(236,72,153,0.1)] text-pink-400'
               }
             `}>
-              {script.content_type === 'inform' ? '💡 Inform' : '✨ Imagine'}
+              <span className="flex items-center gap-1">
+                {script.content_type === 'inform'
+                  ? <><Lightbulb size={10} strokeWidth={2} /> Inform</>
+                  : <><Sparkles size={10} strokeWidth={2} /> Imagine</>
+                }
+              </span>
             </span>
           </div>
 
@@ -143,9 +149,9 @@ export default function ScriptCard({ script, index, language, costAnalysis }) {
 
       {/* Metrics row */}
       <div className="mt-6 pt-5 border-t border-[rgba(255,255,255,0.05)] flex flex-wrap items-center gap-x-6 gap-y-2 text-xs text-[#999]">
-        <span>{script.word_count?.toLocaleString()} words</span>
+        <span>{(script.word_count || 0).toLocaleString()} words</span>
         <span className="text-[rgba(255,255,255,0.15)] hidden sm:inline">|</span>
-        <span>{script.estimated_audio_minutes} min audio</span>
+        <span>{script.estimated_audio_minutes || 0} min audio</span>
         <span className="text-[rgba(255,255,255,0.15)] hidden sm:inline">|</span>
         <span>{langLabel}</span>
         <span className="text-[rgba(255,255,255,0.15)] hidden sm:inline">|</span>

@@ -1,12 +1,13 @@
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
+import { Search, Newspaper, Brain, PenLine, BarChart3, Hourglass } from 'lucide-react'
 
 const stages = [
-  { text: 'Scanning trending topics across India', icon: '🔍', duration: 4000 },
-  { text: 'Discovered topics from Google News & Google Trends', icon: '📰', duration: 3000 },
-  { text: 'AI Research Agent selecting top 3 stories', icon: '🧠', duration: 5000 },
-  { text: 'Writing scripts', icon: '✍️', duration: 15000 },
-  { text: 'Scoring quality & calculating costs', icon: '📊', duration: 3000 },
+  { text: 'Scanning trending topics across India', Icon: Search, duration: 4000 },
+  { text: 'Discovered 25+ topics from Google News & Google Trends', Icon: Newspaper, duration: 3000 },
+  { text: 'AI Research Agent selecting top 3 stories', Icon: Brain, duration: 5000 },
+  { text: 'Writing scripts', Icon: PenLine, duration: 15000 },
+  { text: 'Scoring quality & calculating costs', Icon: BarChart3, duration: 3000 },
 ]
 
 export default function LoadingStages({ language }) {
@@ -77,12 +78,16 @@ export default function LoadingStages({ language }) {
                 className="flex items-center gap-4"
               >
                 {/* Status indicator */}
-                <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-sm
+                <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center
                   ${isDone ? 'bg-[rgba(245,166,35,0.15)] text-[#F5A623]' : ''}
-                  ${isActive ? 'bg-[rgba(245,166,35,0.2)]' : ''}
-                  ${isPending ? 'bg-[rgba(255,255,255,0.03)]' : ''}
+                  ${isActive ? 'bg-[rgba(245,166,35,0.2)] text-[#F5A623]' : ''}
+                  ${isPending ? 'bg-[rgba(255,255,255,0.03)] text-[#555]' : ''}
                 `}>
-                  {isDone ? '✓' : stage.icon}
+                  {isDone ? (
+                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2.5 7L5.5 10L11.5 4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                  ) : (
+                    <stage.Icon size={14} strokeWidth={2} />
+                  )}
                 </div>
 
                 {/* Text */}
@@ -113,13 +118,13 @@ export default function LoadingStages({ language }) {
               animate={{ opacity: 1, y: 0 }}
               className="flex items-center gap-4 mt-2"
             >
-              <div className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-sm bg-[rgba(245,166,35,0.2)]">
-                <motion.span
+              <div className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center bg-[rgba(245,166,35,0.2)] text-[#F5A623]">
+                <motion.div
                   animate={{ rotate: [0, 360] }}
                   transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
                 >
-                  ⏳
-                </motion.span>
+                  <Hourglass size={14} strokeWidth={2} />
+                </motion.div>
               </div>
               <p className="text-sm text-[#FAFAFA]">
                 Almost there — polishing the final output
@@ -154,7 +159,7 @@ export default function LoadingStages({ language }) {
         </div>
 
         {/* Keep tab open reminder */}
-        <p className="mt-4 text-center text-[10px] text-[#666]">
+        <p className="mt-4 text-center text-[10px] text-[#777]">
           Please keep this tab open while scripts are being generated
         </p>
       </div>

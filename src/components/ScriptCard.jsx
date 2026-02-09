@@ -31,7 +31,7 @@ export default function ScriptCard({ script, index, language }) {
     >
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
-        <div className="flex-1">
+        <div className="flex-1 min-w-0">
           {/* Badges */}
           <div className="flex flex-wrap items-center gap-2 mb-3">
             <span
@@ -56,7 +56,7 @@ export default function ScriptCard({ script, index, language }) {
           </h3>
         </div>
 
-        {/* Confidence Score */}
+        {/* Confidence Score - circle + toggle only */}
         <div className="flex-shrink-0">
           <ConfidenceScore score={script.confidence_score} rationale={script.confidence_rationale} />
         </div>

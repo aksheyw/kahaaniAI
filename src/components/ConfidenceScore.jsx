@@ -61,7 +61,7 @@ export default function ConfidenceScore({ score, rationale }) {
             transition={{ duration: 0.3 }}
             className="overflow-hidden"
           >
-            <div className="mt-4 space-y-3">
+            <div className="mt-4 space-y-3 w-48">
               {Object.entries(breakdownLabels).map(([key, label]) => {
                 const val = score?.[key] || 0
                 return (

@@ -218,6 +218,10 @@ Respond with this JSON structure:
           per_script_inr: Math.round((totalINR / 3) * 100) / 100,
           tokens: { input: inTokens, output: outTokens, total: inTokens + outTokens },
           model: 'gpt-4.1',
+          is_estimate: true,
+          estimation_method: 'Token count approximated at ~4 characters per token. Actual API usage may vary ±15%.',
+          confidence: 85,
+          confidence_note: 'High confidence — based on official GPT-4.1 pricing ($2/M input, $8/M output) and measured prompt/response lengths. Exchange rate ₹90/USD (Feb 2026). Primary variance from token-to-character ratio estimation.',
         },
         human: {
           total_inr: humanTotal,

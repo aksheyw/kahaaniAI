@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion'
+import { Info } from 'lucide-react'
 
 export default function ResultsSummary({ data }) {
   const { totals, cost_analysis } = data
@@ -8,6 +9,8 @@ export default function ResultsSummary({ data }) {
   const humanBasis = cost_analysis?.human?.basis || 'Indian freelance content marketplace average'
   const aiPerScript = cost_analysis?.ai?.per_script_inr || 0
   const humanPerScript = cost_analysis?.human?.per_script_inr || 650
+  const aiConfidence = cost_analysis?.ai?.confidence || null
+  const isEstimate = cost_analysis?.ai?.is_estimate || false
 
   return (
     <motion.div
@@ -43,8 +46,14 @@ export default function ResultsSummary({ data }) {
         {/* Cost breakdown */}
         <div className="mt-6 pt-5 border-t border-[rgba(255,255,255,0.05)] flex flex-col sm:flex-row flex-wrap gap-x-8 gap-y-2 text-xs sm:text-sm">
           <span className="text-[#999]">
-            AI Cost: <span className="text-[#FAFAFA] font-medium">₹{aiCost.toFixed(2)}</span>
+            AI Cost{isEstimate ? '*' : ''}: <span className="text-[#FAFAFA] font-medium">₹{aiCost.toFixed(2)}</span>
             <span className="text-[#888] ml-1">(₹{aiPerScript.toFixed(2)}/script)</span>
+            {aiConfidence && (
+              <span className="inline-flex items-center gap-1 ml-2 text-[10px] text-[#F5A623] opacity-80">
+                <Info size={10} />
+                {aiConfidence}% confidence
+              </span>
+            )}
           </span>
           <span className="text-[#999]">
             Human Cost: <span className="text-[#FAFAFA] font-medium">₹{humanCost.toLocaleString()}</span>
@@ -57,7 +66,7 @@ export default function ResultsSummary({ data }) {
 
         {/* Basis footnote */}
         <p className="mt-3 text-[10px] text-[#888] leading-relaxed">
-          Human cost based on {humanBasis}. AI cost from GPT-4.1 API pricing ($2/M input, $8/M output tokens). Professional audio scriptwriting rates are typically ₹1,500-5,000/script — real savings may be significantly higher.
+          {isEstimate ? '*AI cost is an estimate — ' : ''}Token count approximated at ~4 chars/token from measured prompt and response lengths. Based on official GPT-4.1 API pricing ($2/M input, $8/M output tokens) at ₹90/USD. Actual cost may vary ±15%. Human cost based on {humanBasis}. Professional audio scriptwriting rates are typically ₹1,500-5,000/script — real savings may be significantly higher.
         </p>
       </div>
     </motion.div>

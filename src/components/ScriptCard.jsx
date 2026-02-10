@@ -120,7 +120,7 @@ export default function ScriptCard({ script, index, language, costAnalysis }) {
               </div>
               <button
                 onClick={() => setExpanded(false)}
-                className="mt-3 text-[#F5A623] text-sm font-medium hover:underline"
+                className="mt-3 py-1.5 text-[#F5A623] text-sm font-medium hover:underline"
               >
                 Show Less
               </button>
@@ -138,7 +138,7 @@ export default function ScriptCard({ script, index, language, costAnalysis }) {
               </p>
               <button
                 onClick={() => setExpanded(true)}
-                className="mt-2 text-[#F5A623] text-sm font-medium hover:underline"
+                className="mt-2 py-1.5 text-[#F5A623] text-sm font-medium hover:underline"
               >
                 Read Full Script
               </button>

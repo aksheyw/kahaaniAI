@@ -82,7 +82,7 @@ export default function Hero({ mode, setMode, language, setLanguage, onGenerate,
               key={l.id}
               onClick={() => setLanguage(l.id)}
               className={`
-                px-4 py-2.5 rounded-xl text-xs font-medium transition-all duration-300
+                px-4 py-3 rounded-xl text-xs font-medium transition-all duration-300
                 ${language === l.id
                   ? 'bg-[rgba(245,166,35,0.1)] text-[#F5A623] border border-[rgba(245,166,35,0.25)]'
                   : 'text-[#777] hover:text-[#999] border border-transparent'

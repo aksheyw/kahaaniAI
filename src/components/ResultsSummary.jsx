@@ -57,7 +57,7 @@ export default function ResultsSummary({ data }) {
 
         {/* Basis footnote */}
         <p className="mt-3 text-[10px] text-[#888] leading-relaxed">
-          Human cost based on {humanBasis} (Pepper Content, Fiverr India, WriterAccess). AI cost from GPT-4.1 API pricing ($2/M input, $8/M output tokens).
+          Human cost based on {humanBasis}. AI cost from GPT-4.1 API pricing ($2/M input, $8/M output tokens). Professional audio scriptwriting rates are typically ₹1,500-5,000/script — real savings may be significantly higher.
         </p>
       </div>
     </motion.div>

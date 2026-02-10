@@ -176,14 +176,13 @@ Respond with this JSON structure:
 
     // ── Step 4: Format response with cost analysis ──
     const scripts = scriptData.scripts || []
-    const researchChars = researchResp.length || 1500
-    const writerChars = writerResp.length
-    const inTokens = Math.ceil(5500 / 4)
-    const outTokens = Math.ceil((researchChars + writerChars) / 4)
-    const inCost = (inTokens / 1000000) * 2
-    const outCost = (outTokens / 1000000) * 8
+    // Use actual prompt + response lengths for accurate cost tracking
+    const inTokens = Math.ceil((researchPrompt.length + writerPrompt.length) / 4)
+    const outTokens = Math.ceil(((researchResp.length || 500) + writerResp.length) / 4)
+    const inCost = (inTokens / 1000000) * 2   // GPT-4.1: $2/M input
+    const outCost = (outTokens / 1000000) * 8  // GPT-4.1: $8/M output
     const totalUSD = inCost + outCost
-    const totalINR = totalUSD * 85
+    const totalINR = totalUSD * 90             // ₹90/USD (Feb 2026, actual ~₹90.66)
     const humanPerScript = 650
     const humanTotal = humanPerScript * 3
 
@@ -223,7 +222,7 @@ Respond with this JSON structure:
         human: {
           total_inr: humanTotal,
           per_script_inr: humanPerScript,
-          basis: 'Indian freelance content marketplace average',
+          basis: 'Indian freelance content marketplace — entry-level rate (Pepper Content, Fiverr India)',
         },
         savings: {
           multiplier: totalINR > 0 ? Math.round(humanTotal / totalINR) + 'x' : 'N/A',

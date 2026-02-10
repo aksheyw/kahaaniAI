@@ -16,7 +16,7 @@ export default function ResultsSummary({ data }) {
       transition={{ duration: 0.6 }}
     >
       {/* Summary strip */}
-      <div className="glass rounded-2xl p-6 sm:p-8">
+      <div className="glass rounded-xl sm:rounded-2xl p-4 sm:p-6 md:p-8">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
           {/* Stats */}
           <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-sm sm:text-base text-[#ccc]">
@@ -34,14 +34,14 @@ export default function ResultsSummary({ data }) {
           </div>
 
           {/* Savings */}
-          <div className="text-right">
-            <div className="text-3xl sm:text-4xl font-extrabold text-[#F5A623]">{savings}</div>
+          <div className="text-left sm:text-right">
+            <div className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-[#F5A623]">{savings}</div>
             <div className="text-xs text-[#999] mt-1">cost savings</div>
           </div>
         </div>
 
         {/* Cost breakdown */}
-        <div className="mt-6 pt-5 border-t border-[rgba(255,255,255,0.05)] flex flex-wrap gap-x-8 gap-y-2 text-sm">
+        <div className="mt-6 pt-5 border-t border-[rgba(255,255,255,0.05)] flex flex-col sm:flex-row flex-wrap gap-x-8 gap-y-2 text-xs sm:text-sm">
           <span className="text-[#999]">
             AI Cost: <span className="text-[#FAFAFA] font-medium">₹{aiCost.toFixed(2)}</span>
             <span className="text-[#888] ml-1">(₹{aiPerScript.toFixed(2)}/script)</span>

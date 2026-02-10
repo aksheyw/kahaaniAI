@@ -51,7 +51,7 @@ export default function ScriptCard({ script, index, language, costAnalysis }) {
       initial={{ opacity: 0, y: 30 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay: index * 0.15 }}
-      className="glass rounded-2xl p-6 sm:p-8 glass-hover transition-all duration-300"
+      className="glass rounded-xl sm:rounded-2xl p-4 sm:p-6 md:p-8 glass-hover transition-all duration-300"
     >
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
@@ -86,7 +86,7 @@ export default function ScriptCard({ script, index, language, costAnalysis }) {
           </div>
 
           {/* Title */}
-          <h3 className="text-xl sm:text-2xl font-bold text-[#FAFAFA] leading-tight">
+          <h3 className="text-lg sm:text-xl md:text-2xl font-bold text-[#FAFAFA] leading-tight">
             {script.title}
           </h3>
         </div>
@@ -148,25 +148,28 @@ export default function ScriptCard({ script, index, language, costAnalysis }) {
       </div>
 
       {/* Metrics row */}
-      <div className="mt-6 pt-5 border-t border-[rgba(255,255,255,0.05)] flex flex-wrap items-center gap-x-6 gap-y-2 text-xs text-[#999]">
-        <span>{(script.word_count || 0).toLocaleString()} words</span>
-        <span className="text-[rgba(255,255,255,0.15)] hidden sm:inline">|</span>
-        <span>{script.estimated_audio_minutes || 0} min audio</span>
-        <span className="text-[rgba(255,255,255,0.15)] hidden sm:inline">|</span>
-        <span>{langLabel}</span>
-        <span className="text-[rgba(255,255,255,0.15)] hidden sm:inline">|</span>
-        <span>
-          <span className="text-[#F5A623] font-semibold">₹{aiPerScript.toFixed(2)}</span>
-          {' '}AI vs{' '}
-          <span className="text-[#999]">₹{humanPerScript.toLocaleString()}</span>
-          {' '}human
-        </span>
-        <button
-          onClick={copyScript}
-          className="ml-auto px-3 py-1 rounded-lg text-xs font-medium text-[#999] hover:text-[#F5A623] border border-[rgba(255,255,255,0.08)] hover:border-[rgba(245,166,35,0.3)] transition-all duration-300"
-        >
-          {copied ? 'Copied!' : 'Copy Script'}
-        </button>
+      <div className="mt-4 sm:mt-6 pt-4 sm:pt-5 border-t border-[rgba(255,255,255,0.05)]">
+        <div className="flex flex-wrap items-center gap-x-4 sm:gap-x-6 gap-y-1.5 text-xs text-[#999]">
+          <span>{(script.word_count || 0).toLocaleString()} words</span>
+          <span className="text-[rgba(255,255,255,0.15)] hidden sm:inline">|</span>
+          <span>{script.estimated_audio_minutes || 0} min audio</span>
+          <span className="text-[rgba(255,255,255,0.15)] hidden sm:inline">|</span>
+          <span>{langLabel}</span>
+        </div>
+        <div className="flex items-center justify-between mt-2.5 gap-3">
+          <span className="text-xs text-[#999]">
+            <span className="text-[#F5A623] font-semibold">₹{aiPerScript.toFixed(2)}</span>
+            {' '}AI vs{' '}
+            <span className="text-[#999]">₹{humanPerScript.toLocaleString()}</span>
+            {' '}human
+          </span>
+          <button
+            onClick={copyScript}
+            className="flex-shrink-0 px-3 py-1.5 rounded-lg text-xs font-medium text-[#999] hover:text-[#F5A623] border border-[rgba(255,255,255,0.08)] hover:border-[rgba(245,166,35,0.3)] transition-all duration-300"
+          >
+            {copied ? 'Copied!' : 'Copy Script'}
+          </button>
+        </div>
       </div>
     </motion.div>
   )

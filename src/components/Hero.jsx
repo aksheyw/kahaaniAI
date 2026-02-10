@@ -22,7 +22,7 @@ export default function Hero({ mode, setMode, language, setLanguage, onGenerate,
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, ease: 'easeOut' }}
       >
-        <h1 className="text-5xl sm:text-7xl font-extrabold tracking-tight">
+        <h1 className="text-4xl sm:text-5xl md:text-7xl font-extrabold tracking-tight">
           <span className="bg-gradient-to-r from-[#F5A623] via-[#E8B84B] to-[#F5A623] bg-clip-text text-transparent">
             Kahaani AI
           </span>
@@ -35,7 +35,7 @@ export default function Hero({ mode, setMode, language, setLanguage, onGenerate,
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, delay: 0.2, ease: 'easeOut' }}
-        className="mt-6 text-lg sm:text-xl text-[#999] font-light max-w-xl mx-auto leading-relaxed"
+        className="mt-4 sm:mt-6 text-base sm:text-lg md:text-xl text-[#999] font-light max-w-xl mx-auto px-2 leading-relaxed"
       >
         Stories that India wants to hear, written by AI in seconds
       </motion.p>
@@ -45,14 +45,14 @@ export default function Hero({ mode, setMode, language, setLanguage, onGenerate,
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, delay: 0.4 }}
-        className="mt-10 flex justify-center gap-3"
+        className="mt-10 flex justify-center gap-2 sm:gap-3 flex-wrap"
       >
         {modes.map((m) => (
           <button
             key={m.id}
             onClick={() => setMode(m.id)}
             className={`
-              relative px-5 py-3 rounded-2xl text-sm font-medium transition-all duration-300
+              relative px-3 py-2.5 sm:px-5 sm:py-3 rounded-xl sm:rounded-2xl text-xs sm:text-sm font-medium transition-all duration-300
               ${mode === m.id
                 ? 'bg-[rgba(245,166,35,0.12)] text-[#F5A623] border border-[rgba(245,166,35,0.3)]'
                 : 'glass text-[#888] hover:text-[#ccc] hover:border-[rgba(255,255,255,0.1)]'
@@ -106,7 +106,7 @@ export default function Hero({ mode, setMode, language, setLanguage, onGenerate,
           onClick={onGenerate}
           disabled={loading}
           className={`
-            relative px-10 py-4 rounded-2xl text-lg font-bold transition-all duration-500
+            relative px-8 py-3.5 sm:px-10 sm:py-4 rounded-2xl text-base sm:text-lg font-bold transition-all duration-500
             ${loading
               ? 'bg-[rgba(245,166,35,0.2)] text-[#F5A623] cursor-wait'
               : 'bg-[#F5A623] text-black hover:bg-[#E8B84B] hover:shadow-[0_0_40px_rgba(245,166,35,0.3)]'

@@ -43,7 +43,7 @@ export default function App() {
     { scripts_generated: 0, total_words: 0, total_audio_minutes: 0 }
   )
 
-  const generate = useCallback(async () => {
+  const generate = useCallback(async (append = false) => {
     // Double-click protection
     if (generatingRef.current) return
     generatingRef.current = true
@@ -67,7 +67,7 @@ export default function App() {
       if (!res.ok) throw new Error(`Server error: ${res.status}`)
       const data = await res.json()
       if (data.status === 'success') {
-        setAllResults(prev => [...prev, data])
+        setAllResults(append ? prev => [...prev, data] : [data])
         const entry = addToHistory(data)
         setHistory(prev => [entry, ...prev])
       } else {
@@ -167,9 +167,9 @@ export default function App() {
 
               {/* Research Summary — latest generation */}
               {latestResult?.research && (
-                <div className="mt-10 glass rounded-2xl p-6 sm:p-8">
-                  <h3 className="text-sm font-medium text-[#999] uppercase tracking-wider mb-3">Research Summary</h3>
-                  <p className="text-[#FAFAFA] text-lg leading-relaxed">{latestResult.research.summary}</p>
+                <div className="mt-8 sm:mt-10 glass rounded-xl sm:rounded-2xl p-4 sm:p-6 md:p-8">
+                  <h3 className="text-xs sm:text-sm font-medium text-[#999] uppercase tracking-wider mb-3">Research Summary</h3>
+                  <p className="text-[#FAFAFA] text-base sm:text-lg leading-relaxed">{latestResult.research.summary}</p>
                   <div className="mt-4 flex flex-wrap gap-4 text-sm text-[#999]">
                     <span>Sources: {latestResult.research.sources?.join(', ')}</span>
                     <span className="text-[rgba(255,255,255,0.2)]">|</span>
@@ -194,9 +194,9 @@ export default function App() {
               {/* Generate More */}
               <div className="mt-12 text-center">
                 <button
-                  onClick={generate}
+                  onClick={() => generate(true)}
                   disabled={loading}
-                  className="px-8 py-4 rounded-xl bg-transparent border border-[#F5A623] text-[#F5A623] font-semibold text-lg hover:bg-[#F5A623] hover:text-black transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full sm:w-auto px-8 py-3.5 sm:py-4 rounded-xl bg-transparent border border-[#F5A623] text-[#F5A623] font-semibold text-base sm:text-lg hover:bg-[#F5A623] hover:text-black transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   Generate More Scripts
                 </button>

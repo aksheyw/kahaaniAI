@@ -95,6 +95,24 @@ export default function App() {
     setHistory([])
   }
 
+  const handleRestoreFromHistory = useCallback((entry) => {
+    // Reconstruct a result object from the history entry
+    const restored = {
+      status: 'success',
+      params: { mode: entry.mode, language: entry.language },
+      scripts: entry.scripts || [],
+      totals: entry.totals || {
+        scripts_generated: (entry.scripts || []).length,
+        total_words: (entry.scripts || []).reduce((sum, s) => sum + (s.word_count || 0), 0),
+        total_audio_minutes: (entry.scripts || []).reduce((sum, s) => sum + (s.estimated_audio_minutes || 0), 0),
+      },
+      cost_analysis: entry.cost_analysis || null,
+      research: null, // research summary not stored in history
+    }
+    setAllResults([restored])
+    setHistoryOpen(false)
+  }, [])
+
   return (
     <div className="min-h-screen bg-[#0A0A0A] relative">
       {/* Subtle ambient gradient */}
@@ -118,6 +136,7 @@ export default function App() {
         onClose={() => setHistoryOpen(false)}
         history={history}
         onClear={handleClearHistory}
+        onRestore={handleRestoreFromHistory}
       />
 
       <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">

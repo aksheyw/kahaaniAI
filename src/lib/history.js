@@ -1,7 +1,7 @@
 // localStorage-based generation history for topic deduplication and browsing
 
 const STORAGE_KEY = 'kahaani_history'
-const MAX_ENTRIES = 50
+const MAX_ENTRIES = 20 // reduced from 50 — full scripts stored now
 
 function readHistory() {
   try {
@@ -16,7 +16,12 @@ function writeHistory(entries) {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(entries.slice(0, MAX_ENTRIES)))
   } catch {
-    // localStorage full or unavailable — silently degrade
+    // localStorage full — try with fewer entries
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(entries.slice(0, 10)))
+    } catch {
+      // still full — silently degrade
+    }
   }
 }
 
@@ -36,15 +41,14 @@ export function addToHistory(result) {
       category: s.category,
       content_type: s.content_type,
       hook: s.hook,
+      script: s.script,
       word_count: s.word_count,
       estimated_audio_minutes: s.estimated_audio_minutes,
-      confidence_overall: s.confidence_score?.overall,
+      confidence_score: s.confidence_score,
+      confidence_rationale: s.confidence_rationale,
     })),
     totals: result.totals,
-    cost_analysis_summary: {
-      ai_total_inr: result.cost_analysis?.ai?.total_inr,
-      savings_multiplier: result.cost_analysis?.savings?.multiplier,
-    },
+    cost_analysis: result.cost_analysis,
   }
   const history = [entry, ...readHistory()]
   writeHistory(history)

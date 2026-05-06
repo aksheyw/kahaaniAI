@@ -4,7 +4,7 @@
 
 **An AI agent that generates 3 publication-ready audio scripts in 90 seconds — for ₹2 instead of ₹2,000.**
 
-[![Live Demo](https://img.shields.io/badge/Live_Demo-kahaani--ai.vercel.app-F5A623?style=for-the-badge)](https://kahaani-ai-livid.vercel.app)
+[![Live Demo](https://img.shields.io/badge/Live_Demo-kahaani--ai--livid.vercel.app-F5A623?style=for-the-badge)](https://kahaani-ai-livid.vercel.app)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg?style=for-the-badge)](LICENSE)
 [![Built With](https://img.shields.io/badge/Built_With-React_·_Vercel_·_GPT--4.1-black?style=for-the-badge)](#tech-stack)
 

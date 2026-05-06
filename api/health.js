@@ -5,15 +5,15 @@ export default function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*')
   res.setHeader('Cache-Control', 'no-store')
 
-  const hasOpenAIKey = Boolean(process.env.OPENAI_API_KEY)
-  const healthy = hasOpenAIKey
+  const hasApiKey = Boolean(process.env.KAHAANI_AI_OPENROUTER_API_KEY)
 
-  return res.status(healthy ? 200 : 503).json({
-    status: healthy ? 'ok' : 'degraded',
+  return res.status(hasApiKey ? 200 : 503).json({
+    status: hasApiKey ? 'ok' : 'degraded',
     service: 'Kahaani AI',
     timestamp: new Date().toISOString(),
     checks: {
-      openai_key_configured: hasOpenAIKey,
+      llm_key_configured: hasApiKey,
+      provider: 'OpenRouter',
       node_env: process.env.NODE_ENV || 'unknown',
     },
   })

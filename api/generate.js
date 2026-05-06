@@ -1,11 +1,15 @@
 // Vercel Serverless Function — Kahaani AI Script Generator
-// Replicates n8n workflow: RSS fetch → Research Agent → Writer Agent → Format
+// Pipeline: RSS fetch → Research Agent → Writer Agent → Format
+// LLM provider: OpenRouter (https://openrouter.ai) — namespaced key per project.
 
 const VALID_MODES = ['inform', 'imagine', 'both']
 const VALID_LANGUAGES = ['en', 'hi', 'hinglish']
 
-// Per-call timeout for OpenAI requests (75s each, allowing two calls within 180s budget)
-const OPENAI_CALL_TIMEOUT_MS = 75000
+// Per-call timeout for LLM requests (75s each, allowing two calls within 180s budget)
+const LLM_CALL_TIMEOUT_MS = 75000
+
+const OPENROUTER_URL = 'https://openrouter.ai/api/v1/chat/completions'
+const MODEL = 'openai/gpt-4.1'
 
 // Curated fallback topics for when RSS feeds return insufficient results
 const FALLBACK_TOPICS = [
@@ -42,8 +46,8 @@ export default async function handler(req, res) {
   const language = VALID_LANGUAGES.includes(rawLang) ? rawLang : 'en'
   const excludeTopics = Array.isArray(req.body?.exclude_topics) ? req.body.exclude_topics : []
 
-  const OPENAI_KEY = process.env.OPENAI_API_KEY
-  if (!OPENAI_KEY) return res.status(500).json({ error: 'Service not configured' })
+  const API_KEY = process.env.KAHAANI_AI_OPENROUTER_API_KEY
+  if (!API_KEY) return res.status(500).json({ error: 'Service not configured' })
 
   try {
     // ── Step 1: Fetch RSS feeds in parallel ──
@@ -114,7 +118,7 @@ Select exactly 3 topics with highest audio content potential for Indian audience
 Respond with this JSON structure:
 {"selected_topics":[{"topic":"Topic title","content_type":"inform or imagine","category":"news|culture|mythology|drama|technology|sports|politics|entertainment|finance|health","angle":"Suggested creative angle","rationale":"Why high potential"}],"research_summary":"2-line summary of trending landscape","topics_analyzed":${news.length + trends.length}}`
 
-    const researchResp = await callOpenAI(OPENAI_KEY, researchPrompt, 0.7, 2000, true)
+    const researchResp = await callLLM(API_KEY, researchPrompt, 0.7, 2000, true)
 
     let research
     try {
@@ -158,7 +162,7 @@ For each of the 3 topics, write an audio script following these rules:
 Respond with this JSON structure:
 {"scripts":[{"topic":"Topic title","content_type":"inform or imagine","category":"category","title":"Creative compelling title","script":"Full script text...","word_count":950,"estimated_audio_minutes":7.5,"hook":"First 30 words","confidence_score":{"overall":82,"hook_strength":85,"narrative_flow":80,"emotional_engagement":78,"audio_readiness":84},"confidence_rationale":"Brief honest explanation of strengths and weaknesses"}]}`
 
-    const writerResp = await callOpenAI(OPENAI_KEY, writerPrompt, 0.8, 8000, true)
+    const writerResp = await callLLM(API_KEY, writerPrompt, 0.8, 8000, true)
 
     let scriptData
     try {
@@ -217,7 +221,8 @@ Respond with this JSON structure:
           total_inr: Math.round(totalINR * 100) / 100,
           per_script_inr: Math.round((totalINR / 3) * 100) / 100,
           tokens: { input: inTokens, output: outTokens, total: inTokens + outTokens },
-          model: 'gpt-4.1',
+          model: MODEL,
+          provider: 'OpenRouter',
           is_estimate: true,
           estimation_method: 'Token count approximated at ~4 characters per token. Actual API usage may vary ±15%.',
           confidence: 85,
@@ -240,9 +245,9 @@ Respond with this JSON structure:
   }
 }
 
-async function callOpenAI(apiKey, prompt, temperature, maxTokens, jsonMode = false) {
+async function callLLM(apiKey, prompt, temperature, maxTokens, jsonMode = false) {
   const body = {
-    model: 'gpt-4.1',
+    model: MODEL,
     messages: [
       ...(jsonMode
         ? [{ role: 'system', content: 'You are a helpful assistant. Always respond with valid JSON.' }]
@@ -253,21 +258,23 @@ async function callOpenAI(apiKey, prompt, temperature, maxTokens, jsonMode = fal
     max_tokens: maxTokens,
   }
 
-  // Enable JSON mode when requested
   if (jsonMode) {
     body.response_format = { type: 'json_object' }
   }
 
   // Per-call timeout to prevent a single call from consuming the entire function budget
   const controller = new AbortController()
-  const timeout = setTimeout(() => controller.abort(), OPENAI_CALL_TIMEOUT_MS)
+  const timeout = setTimeout(() => controller.abort(), LLM_CALL_TIMEOUT_MS)
 
   try {
-    const resp = await fetch('https://api.openai.com/v1/chat/completions', {
+    const resp = await fetch(OPENROUTER_URL, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${apiKey}`,
+        // OpenRouter attribution headers (optional, helpful for OpenRouter's usage analytics)
+        'HTTP-Referer': 'https://github.com/aksheyw/kahaaniAI',
+        'X-Title': 'Kahaani AI',
       },
       body: JSON.stringify(body),
       signal: controller.signal,
@@ -275,14 +282,14 @@ async function callOpenAI(apiKey, prompt, temperature, maxTokens, jsonMode = fal
     clearTimeout(timeout)
     if (!resp.ok) {
       const errText = await resp.text()
-      throw new Error(`OpenAI API error (${resp.status}): ${errText.substring(0, 200)}`)
+      throw new Error(`OpenRouter API error (${resp.status}): ${errText.substring(0, 200)}`)
     }
     const data = await resp.json()
     return data.choices[0].message.content
   } catch (err) {
     clearTimeout(timeout)
     if (err.name === 'AbortError') {
-      throw new Error('OpenAI call timed out after 75 seconds')
+      throw new Error('LLM call timed out after 75 seconds')
     }
     throw err
   }

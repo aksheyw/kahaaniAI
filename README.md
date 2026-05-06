@@ -74,7 +74,7 @@ A 15-topic curated fallback kicks in if the RSS feeds return fewer than 5 items,
 | Animation | **Framer Motion** | Staged loading transitions and AnimatePresence for smooth result reveals. |
 | Icons | **Lucide React** | Consistent SVG icon system. Zero emojis on the page. |
 | Backend | **Vercel Serverless (Node.js)** | One-file backend. No infra to manage. Auto-scales. |
-| AI | **OpenAI GPT-4.1** with `response_format: json_object` | Reliable structured output. Eliminates regex fallback parsing. |
+| AI | **GPT-4.1 via OpenRouter** with `response_format: json_object` | OpenRouter gives one billing surface for any model + reliable structured output. |
 | Hosting | **Vercel** | Auto-deploy from `main`. Edge network. 180s function budget. |
 
 ## Engineering decisions worth calling out
@@ -96,12 +96,12 @@ git clone https://github.com/aksheyw/kahaaniAI.git
 cd kahaaniAI
 npm install
 
-# Add your OpenAI key
-echo "OPENAI_API_KEY=sk-your-key-here" > .env
+# Add your OpenRouter key (get one at https://openrouter.ai/keys)
+echo "KAHAANI_AI_OPENROUTER_API_KEY=sk-or-v1-your-key-here" > .env
 
 # Start the Vercel dev server (runs both Vite + serverless functions)
 npx vercel dev
-# OR for frontend-only with a custom backend:
+# OR frontend-only with a custom backend:
 # echo "VITE_API_URL=https://your-backend.example.com" >> .env.local
 # npm run dev
 ```
@@ -112,7 +112,7 @@ Visit `http://localhost:3000` (Vercel dev) or `http://localhost:5173` (Vite dev)
 
 1. Fork this repo.
 2. Import into Vercel — it auto-detects Vite + the `api/` folder.
-3. Add one environment variable: `OPENAI_API_KEY`.
+3. Add one environment variable: `KAHAANI_AI_OPENROUTER_API_KEY` (your OpenRouter key).
 4. (Optional) `ALLOWED_ORIGIN` to lock down CORS to your domain.
 5. Push to `main` — Vercel auto-deploys.
 

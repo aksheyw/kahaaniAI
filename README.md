@@ -7,7 +7,7 @@
 [![Live Demo](https://img.shields.io/badge/Live_Demo-kahaani--ai--livid.vercel.app-F5A623?style=for-the-badge)](https://kahaani-ai-livid.vercel.app)
 [![CI](https://github.com/aksheyw/kahaaniAI/actions/workflows/ci.yml/badge.svg)](https://github.com/aksheyw/kahaaniAI/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg?style=for-the-badge)](LICENSE)
-[![Built With](https://img.shields.io/badge/Built_With-React_·_Vercel_·_GPT--4.1-black?style=for-the-badge)](#tech-stack)
+[![Built With](https://img.shields.io/badge/Built_With-React_·_Vercel_·_OpenAI-black?style=for-the-badge)](#tech-stack)
 
 [**→ Try the live demo**](https://kahaani-ai-livid.vercel.app)
 
@@ -47,7 +47,7 @@ This is a working product, not a deck. Open the live link and try it.
 | **Output volume** | 22 minutes of audio per generation | — | — |
 | **Confidence transparency** | AI self-scores hook, narrative, emotion, audio-readiness | Subjective | — |
 
-Cost basis: GPT-4.1 official pricing ($2/M input, $8/M output) × measured prompt/response lengths × ₹90/USD. Human rate: Indian freelance content marketplace (Pepper Content, Fiverr India). All numbers are reproducible from the [`api/generate.js`](api/generate.js) cost-tracking logic.
+Cost basis: OpenAI flagship model pricing as of build date (~$2/M input, $8/M output) × measured prompt/response lengths × ₹90/USD. Human rate: Indian freelance content marketplace (Pepper Content, Fiverr India). All numbers are reproducible from the [`api/generate.js`](api/generate.js) cost-tracking logic — re-run with current model rates to update.
 
 ## Architecture
 
@@ -56,8 +56,8 @@ flowchart LR
     A[React + Vite UI<br/>Tailwind · Framer Motion] -->|POST /api/generate| B[Vercel Serverless<br/>Node.js function]
     B -->|fetch| C[Google News<br/>India RSS]
     B -->|fetch| D[Google Trends<br/>India RSS]
-    B -->|chat completion<br/>JSON mode| E[OpenAI GPT-4.1<br/>Research Agent]
-    E -->|3 selected topics| F[OpenAI GPT-4.1<br/>Writer + Scorer Agent]
+    B -->|chat completion<br/>JSON mode| E[OpenAI<br/>Research Agent]
+    E -->|3 selected topics| F[OpenAI<br/>Writer + Scorer Agent]
     F -->|3 scripts + scores| G[Cost analysis<br/>+ format response]
     G -->|JSON| A
 ```
@@ -70,19 +70,19 @@ A 15-topic curated fallback kicks in if the RSS feeds return fewer than 5 items,
 
 | Layer | Choice | Why |
 |---|---|---|
-| Frontend | **React 18 + Vite** | Fastest path to a polished SPA. Vite's dev experience is unmatched for portfolio work. |
+| Frontend | **React + Vite** | Fastest path to a polished SPA. Vite's dev experience is unmatched for portfolio work. |
 | Styling | **Tailwind CSS** | Dark, premium aesthetic without writing CSS. Glass-morphism cards, custom gold accent. |
 | Animation | **Framer Motion** | Staged loading transitions and AnimatePresence for smooth result reveals. |
 | Icons | **Lucide React** | Consistent SVG icon system. Zero emojis on the page. |
 | Backend | **Vercel Serverless (Node.js)** | One-file backend. No infra to manage. Auto-scales. |
-| AI | **GPT-4.1 via OpenRouter** with `response_format: json_object` | OpenRouter gives one billing surface for any model + reliable structured output. |
+| AI | **OpenAI via OpenRouter** with `response_format: json_object` | OpenRouter gives one billing surface for any model + reliable structured output. Model is configurable; current build uses OpenAI's flagship. |
 | Hosting | **Vercel** | Auto-deploy from `main`. Edge network. 180s function budget. |
 
 ## Engineering decisions worth calling out
 
 1. **Two-agent split, not one.** A single prompt asking "pick topics + write scripts" produces shallow output. Splitting into Research Agent (picks 3 topics with rationale) → Writer Agent (writes 800-1200 words each with self-scoring) yields markedly better quality and gives the UI an honest reason to show staged progress.
 
-2. **JSON mode + per-call timeouts.** GPT-4.1's `response_format: json_object` removes the need for regex-based parsing of markdown-fenced responses. Each OpenAI call has a 75s `AbortController` timeout so a single slow call can't consume the entire 180s Vercel function budget. ([`api/generate.js:243`](api/generate.js#L243))
+2. **JSON mode + per-call timeouts.** OpenAI's `response_format: json_object` removes the need for regex-based parsing of markdown-fenced responses. Each OpenAI call has a 75s `AbortController` timeout so a single slow call can't consume the entire 180s Vercel function budget. ([`api/generate.js:243`](api/generate.js#L243))
 
 3. **RSS fallback strategy.** Google News/Trends RSS occasionally returns sparse results from Vercel's edge regions. The function falls through to 15 curated India-relevant topics when total feed items < 5, so the demo never silently degrades. ([`api/generate.js:11`](api/generate.js#L11))
 
@@ -146,7 +146,7 @@ kahaani-landing/
 
 A few notes from the build that future-me (and forkers) will appreciate:
 
-- **Vercel `maxDuration` matters.** Free tier caps at 60s. GPT-4.1 with 8000 max_tokens routinely takes 90–120s for the writer call alone. I'm on Pro for the demo; the README documents the workaround for free-tier deployers.
+- **Vercel `maxDuration` matters.** Free tier caps at 60s. OpenAI's flagship with 8000 max_tokens routinely takes 90–120s for the writer call alone. I'm on Pro for the demo; the README documents the workaround for free-tier deployers.
 - **Framer Motion's `initial={{ opacity: 0 }}` won't fire on background tabs.** Cosmetic only — never affects real users — but it tripped up automated visual testing.
 - **Mobile responsive on a Motorola Razr (280px outer display) was the hardest viewport.** Solved with `flex-wrap` on button rows, `flex-col sm:flex-row` on data rows, and 44px+ touch targets via `py-3` on language pills.
 - **OpenAI JSON mode requires a system message that mentions "JSON".** Without it, the API errors out. Documented in the OpenAI changelog but easy to miss.
@@ -162,6 +162,6 @@ A few notes from the build that future-me (and forkers) will appreciate:
 
 **Built by [Akshey Walia](https://www.linkedin.com/in/aksheywalia/)** · [LinkedIn](https://www.linkedin.com/in/aksheywalia/) · [aksheywalia.in](https://aksheywalia.in)
 
-*Director-level Product Manager. I build products that ship.*
+*Senior Product Leader · Consumer Platforms at 250M+ Device Scale · AI Product Building · 0-to-1*
 
 </div>

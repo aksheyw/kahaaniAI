@@ -2,7 +2,7 @@
 
 # Kahaani AI
 
-**An AI agent that generates 3 publication-ready audio scripts in 90 seconds — for ₹2 instead of ₹2,000.**
+**An AI agent that generates 3 publication-ready audio scripts in 90 seconds, for ₹2 instead of ₹2,000.**
 
 [![Live Demo](https://img.shields.io/badge/Live_Demo-kahaani--ai--livid.vercel.app-F5A623?style=for-the-badge)](https://kahaani-ai-livid.vercel.app)
 [![CI](https://github.com/aksheyw/kahaaniAI/actions/workflows/ci.yml/badge.svg)](https://github.com/aksheyw/kahaaniAI/actions/workflows/ci.yml)
@@ -44,10 +44,10 @@ This is a working product, not a deck. Open the live link and try it.
 |---|---|---|---|
 | **Cost for 3 scripts** | **₹2.12** | ₹1,950 | **920× cheaper** |
 | **Turnaround** | **~90 seconds** | 2–3 days | ~2,500× faster |
-| **Output volume** | 22 minutes of audio per generation | — | — |
-| **Confidence transparency** | AI self-scores hook, narrative, emotion, audio-readiness | Subjective | — |
+| **Output volume** | 22 minutes of audio per generation | N/A | N/A |
+| **Confidence transparency** | AI self-scores hook, narrative, emotion, audio-readiness | Subjective | N/A |
 
-Cost basis: OpenAI flagship model pricing as of build date (~$2/M input, $8/M output) × measured prompt/response lengths × ₹90/USD. Human rate: Indian freelance content marketplace (Pepper Content, Fiverr India). All numbers are reproducible from the [`api/generate.js`](api/generate.js) cost-tracking logic — re-run with current model rates to update.
+Cost basis: OpenAI flagship model pricing as of build date (~$2/M input, $8/M output) × measured prompt/response lengths × ₹90/USD. Human rate: Indian freelance content marketplace (Pepper Content, Fiverr India). All numbers are reproducible from the [`api/generate.js`](api/generate.js) cost-tracking logic, so re-run with current model rates to update.
 
 ## Architecture
 
@@ -88,7 +88,7 @@ A 15-topic curated fallback kicks in if the RSS feeds return fewer than 5 items,
 
 4. **Topic deduplication via localStorage.** Each generation's topics are cached client-side and sent as `exclude_topics` on subsequent calls, so repeated generations never produce overlapping scripts. ([`src/lib/history.js`](src/lib/history.js))
 
-5. **Cost transparency, with confidence levels.** The cost analysis surface shows AI cost (₹), human cost (₹), savings multiplier — and an "85% confidence" badge with a footnote explaining the ±15% variance window from token-to-character estimation. Honest framing matters more than impressive numbers.
+5. **Cost transparency, with confidence levels.** The cost analysis surface shows AI cost (₹), human cost (₹), savings multiplier, and an "85% confidence" badge with a footnote explaining the ±15% variance window from token-to-character estimation. Honest framing matters more than impressive numbers.
 
 ## Run locally
 
@@ -112,10 +112,10 @@ Visit `http://localhost:3000` (Vercel dev) or `http://localhost:5173` (Vite dev)
 ## Deploy your own
 
 1. Fork this repo.
-2. Import into Vercel — it auto-detects Vite + the `api/` folder.
+2. Import into Vercel, which auto-detects Vite + the `api/` folder.
 3. Add one environment variable: `KAHAANI_AI_OPENROUTER_API_KEY` (your OpenRouter key).
 4. (Optional) `ALLOWED_ORIGIN` to lock down CORS to your domain.
-5. Push to `main` — Vercel auto-deploys.
+5. Push to `main`, and Vercel auto-deploys.
 
 The free tier doesn't support 180s function timeouts; use Vercel Pro or reduce `max_tokens` in [`api/generate.js`](api/generate.js) to fit within 60s.
 
@@ -124,8 +124,8 @@ The free tier doesn't support 180s function timeouts; use Vercel Pro or reduce `
 ```
 kahaani-landing/
 ├── api/
-│   ├── generate.js      # Vercel serverless function — full pipeline in 290 lines
-│   └── health.js        # /api/health — deployment liveness check
+│   ├── generate.js      # Vercel serverless function: full pipeline in 290 lines
+│   └── health.js        # /api/health: deployment liveness check
 ├── src/
 │   ├── App.jsx          # Top-level state, generation flow, history management
 │   ├── components/
@@ -139,7 +139,7 @@ kahaani-landing/
 ├── docs/
 │   ├── architecture.md           # Engineering deep-dive
 │   └── screenshots/              # Embedded above
-└── vercel.json          # Function config — 180s timeout
+└── vercel.json          # Function config: 180s timeout
 ```
 
 ## What I learned shipping this
@@ -147,14 +147,14 @@ kahaani-landing/
 A few notes from the build that future-me (and forkers) will appreciate:
 
 - **Vercel `maxDuration` matters.** Free tier caps at 60s. OpenAI's flagship with 8000 max_tokens routinely takes 90–120s for the writer call alone. I'm on Pro for the demo; the README documents the workaround for free-tier deployers.
-- **Framer Motion's `initial={{ opacity: 0 }}` won't fire on background tabs.** Cosmetic only — never affects real users — but it tripped up automated visual testing.
+- **Framer Motion's `initial={{ opacity: 0 }}` won't fire on background tabs.** Cosmetic only (never affects real users), but it tripped up automated visual testing.
 - **Mobile responsive on a Motorola Razr (280px outer display) was the hardest viewport.** Solved with `flex-wrap` on button rows, `flex-col sm:flex-row` on data rows, and 44px+ touch targets via `py-3` on language pills.
 - **OpenAI JSON mode requires a system message that mentions "JSON".** Without it, the API errors out. Documented in the OpenAI changelog but easy to miss.
 - **Token cost estimation via character count has a ±15% variance.** I disclose this in the UI rather than pretending the number is exact. Honest is better than impressive.
 
 ## License
 
-[MIT](LICENSE) — © 2026 Akshey Walia
+[MIT](LICENSE). © 2026 Akshey Walia
 
 ---
 

@@ -1,9 +1,9 @@
 # Kahaani AI — a case study
 
-**The bet:** the bottleneck in Indian audio content is not ideas or distribution, it is the days and the cost of getting a publishable script written, so I built a proof of concept that turns a topic choice and a language into three publication-ready audio scripts in about ninety seconds, for roughly two rupees instead of the two thousand a freelancer would charge. I built it in four days, and it is a working product you can open and run, not a slide.
+**The bet:** the bottleneck in Indian audio content is not ideas or distribution, it is the days and the cost of getting a publishable script written, so I built a proof of concept that turns a topic choice and a language into three publication-ready audio scripts in a couple of minutes, for roughly two rupees instead of the two thousand a freelancer would charge. I built the working version in a single day, and it is a working product you can open and run, not a slide.
 
 ## The problem
-A content team in India that wants to test a new show or format pays a freelancer somewhere around two thousand rupees per script and waits two to three days, which means every experiment is slow and expensive enough that most never get tried. If the script itself could be near-free and near-instant, the constraint moves from "can we afford to try this" to "what should we try", and that is a much better problem to have.
+A content team in India that wants to test a new show or format pays a freelancer somewhere around six hundred and fifty rupees per script and waits two to three days, which means every experiment is slow and expensive enough that most never get tried. If the script itself could be near-free and near-instant, the constraint moves from "can we afford to try this" to "what should we try", and that is a much better problem to have.
 
 ## The decisions that mattered most
 The first was splitting the work across two agents rather than one, because a single prompt that picks topics and writes scripts in one pass produces shallow output, so I separated a Research agent that chooses the three highest-potential topics out of about thirty trending items from a Writer agent that turns each into an eight-hundred to twelve-hundred word script and scores its own confidence, and the quality difference was immediate.

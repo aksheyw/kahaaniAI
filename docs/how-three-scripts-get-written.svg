@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 310" width="960" height="310" role="img" aria-label="What happens when you press Generate in Kahaani AI" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif">
+  <rect x="0" y="0" width="960" height="310" fill="#FFFFFF"/>
+  <text x="480" y="34" text-anchor="middle" font-size="19" font-weight="700" fill="#1B2A4A">What happens when you press Generate</text>
+
+  <defs>
+    <!-- refX="10" puts the arrow TIP exactly on the line's end point, so every arrow ends on a box edge -->
+    <marker id="arrow" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#0B6E5F"/>
+    </marker>
+  </defs>
+
+  <!-- column labels -->
+  <text x="135" y="66" text-anchor="middle" font-size="12" font-weight="700" fill="#5B6169" letter-spacing="1">1. YOU PICK</text>
+  <text x="475" y="66" text-anchor="middle" font-size="12" font-weight="700" fill="#5B6169" letter-spacing="1">2. RESEARCH, THEN WRITE</text>
+  <text x="825" y="66" text-anchor="middle" font-size="12" font-weight="700" fill="#5B6169" letter-spacing="1">3. YOU GET</text>
+
+  <!-- column 1: the two choices (x 20 to 250) -->
+  <rect x="20" y="84" width="230" height="90" rx="10" fill="#F3F5F9" stroke="#B9BEC6"/>
+  <text x="135" y="114" text-anchor="middle" font-size="15" font-weight="700" fill="#1B2A4A">A mode</text>
+  <text x="135" y="138" text-anchor="middle" font-size="11.5" fill="#5B6169">Inform, Imagine or Both</text>
+  <text x="135" y="156" text-anchor="middle" font-size="11.5" fill="#5B6169">news explainers, fiction or a mix</text>
+
+  <rect x="20" y="190" width="230" height="80" rx="10" fill="#F3F5F9" stroke="#B9BEC6"/>
+  <text x="135" y="222" text-anchor="middle" font-size="15" font-weight="700" fill="#1B2A4A">A language</text>
+  <text x="135" y="245" text-anchor="middle" font-size="11.5" fill="#5B6169">English, Hindi or Hinglish</text>
+
+  <!-- arrows 1 -> 2: from each choice's right edge (x 250) to the pipeline's left edge (x 290) -->
+  <line x1="250" y1="129" x2="290" y2="129" stroke="#0B6E5F" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="250" y1="230" x2="290" y2="230" stroke="#0B6E5F" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <!-- column 2: the pipeline (x 290 to 660), inner boxes x 306 to 644 -->
+  <rect x="290" y="80" width="370" height="208" rx="12" fill="#E6F4F1" stroke="#0E9384"/>
+
+  <rect x="306" y="92" width="338" height="64" rx="8" fill="#FFFFFF" stroke="#0E9384"/>
+  <text x="475" y="112" text-anchor="middle" font-size="13.5" font-weight="700" fill="#1B2A4A">The app reads the news feeds</text>
+  <text x="475" y="130" text-anchor="middle" font-size="11.5" fill="#5B6169">Google News and Google Trends, India</text>
+  <text x="475" y="146" text-anchor="middle" font-size="11.5" fill="#5B6169">topped up from 15 curated topics if few arrive</text>
+
+  <line x1="475" y1="156" x2="475" y2="172" stroke="#0B6E5F" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <rect x="306" y="172" width="338" height="46" rx="8" fill="#FFFFFF" stroke="#0E9384"/>
+  <text x="475" y="191" text-anchor="middle" font-size="13.5" font-weight="700" fill="#1B2A4A">Research agent</text>
+  <text x="475" y="208" text-anchor="middle" font-size="11.5" fill="#5B6169">picks the 3 topics that should work best as audio</text>
+
+  <line x1="475" y1="218" x2="475" y2="230" stroke="#0B6E5F" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <rect x="306" y="230" width="338" height="46" rx="8" fill="#FFFFFF" stroke="#0E9384"/>
+  <text x="475" y="249" text-anchor="middle" font-size="13.5" font-weight="700" fill="#1B2A4A">Writer agent</text>
+  <text x="475" y="266" text-anchor="middle" font-size="11.5" fill="#5B6169">writes the 3 scripts and scores each one</text>
+
+  <!-- arrows 2 -> 3: from the Writer box's right edge (x 644) to each output's left edge (x 710) -->
+  <line x1="644" y1="244" x2="710" y2="180" stroke="#0B6E5F" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="644" y1="262" x2="710" y2="254" stroke="#0B6E5F" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <!-- column 3: the outputs (x 710 to 940) -->
+  <rect x="710" y="84" width="230" height="122" rx="10" fill="#E6F4F1" stroke="#0E9384"/>
+  <text x="825" y="110" text-anchor="middle" font-size="15" font-weight="700" fill="#1B2A4A">3 audio scripts</text>
+  <text x="825" y="130" text-anchor="middle" font-size="11.5" fill="#0B6E5F">each with an AI Confidence score</text>
+  <text x="825" y="146" text-anchor="middle" font-size="11.5" fill="#5B6169">covering hook strength,</text>
+  <text x="825" y="162" text-anchor="middle" font-size="11.5" fill="#5B6169">narrative flow, emotional</text>
+  <text x="825" y="178" text-anchor="middle" font-size="11.5" fill="#5B6169">engagement and audio readiness</text>
+
+  <rect x="710" y="220" width="230" height="74" rx="10" fill="#FFFFFF" stroke="#0E9384"/>
+  <text x="825" y="246" text-anchor="middle" font-size="15" font-weight="700" fill="#1B2A4A">A cost estimate</text>
+  <text x="825" y="266" text-anchor="middle" font-size="11.5" fill="#5B6169">estimated AI cost vs a freelancer</text>
+  <text x="825" y="282" text-anchor="middle" font-size="11.5" fill="#5B6169">at ₹650 a script</text>
+</svg>
